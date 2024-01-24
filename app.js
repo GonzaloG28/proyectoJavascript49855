@@ -1,39 +1,56 @@
 
-let nuevaContraseña
-let verificacion = true
+alert("bienvenido a nuestra tienda de zapatillas")
+let usuario
+let compra
+let validacion = true
+const fechaActual = new Date()
 
-while(verificacion){
-    nuevaContraseña = prompt("Ingrese su nueva contraseña")
-    if(nuevaContraseña == ""){
-        alert("Porfavor ingrese una contraseña")
+let zapatillas = [
+    {marca: "adidas", color: "amarillo", cantidad: 8},
+    {marca: "nike", color: "negro", cantidad: 5 },
+    {marca: "puma", color: "azul", cantidad: 1 },
+    {marca: "vans", color: "blanco", cantidad: 3 },
+    {marca: "converse", color: "rojo", cantidad: 2}
+];
 
-    }else{
-        alert("Tu nueva contraseña es: " + nuevaContraseña)
-        verificacion = false
-    }
-}
+        /* esta funcion busca los detalles del objeto que se busco a traves de la otra funcion
+            de la misma variable 
+            */ 
 
+        function compraZapatilla(marcaEncontrada){
 
-function inicioSesion(contraseña, verificacionSesion, intento){
-        verificacionSesion = true
-        intento = 1
-    do{
-         contraseña = prompt("Ingrese su contraseña para iniciar sesion (solo tiene 4 intentos)")
-        if(contraseña === nuevaContraseña){
-            alert("BIENVENIDO A TU CUENTA")
-            verificacionSesion = false
-        }else{
-            alert("Error, ingrese su contraseña porfavor")
-            intento++
-            if(intento > 4){
-                alert("Superaste el limite de intentos, intentalo mas tarde")
-                break
+            if(marcaEncontrada){
+                alert("Tenemos " + marcaEncontrada.cantidad  + " pares," + " de color " + marcaEncontrada.color.toUpperCase())
+                compra = confirm("Desea comprar?")
+            }
+            if(compra == true && marcaEncontrada){
+                alert("A comprado unas zapatillas marca " + marcaEncontrada.marca.toUpperCase() + " color " + marcaEncontrada.color.toUpperCase() + " el dia " + fechaActual.toLocaleDateString())
+            }else if(compra == false){
+                validacion = true
+            }
+            
+        }
+
+        
+        while(validacion){
+            usuario = prompt("Ingrese la marca de zapatilla que busca").toLowerCase()
+
+            /* esto lo que hace es que el metodo find busque dentro de la array basandose en la propiedad marca, la funcion zapatilla sirve como argumento del find
+                zapatilla representa cada elemento del array
+                zapatilla.marca accede a la propiedad marca
+            */ 
+            let marcaEncontrada = zapatillas.find( (zapatilla) => zapatilla.marca === usuario) 
+
+            if(marcaEncontrada){
+                alert("Si tenemos zapatillas marca " + usuario.toUpperCase())
+                validacion = false
+                compraZapatilla(marcaEncontrada)
+            }else if (usuario == ""){
+                alert("Ingrese una marca de zapatilla porfavor")
+            }else{
+                alert("disculpe, no tenemos de esa marca, intente con otra")
             }
         }
-    } while(verificacionSesion)
-}
 
 
-if(verificacion == false){
-    inicioSesion()
-}
+
