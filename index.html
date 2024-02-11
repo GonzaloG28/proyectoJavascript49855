@@ -1,13 +1,82 @@
 <!DOCTYPE html>
-<html lang="en/es">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
     <title>Proyecto JavaScript</title>
 </head>
 <body>
-    
+    <header>
+        <nav class="navbar navbar-expand-lg navegacion">
+            <div>
+              <a class="navbar-brand logo" href="./index.html">TuZapatilla.com</a>
+            </div>
+            
+            <form class="d-flex buscador">
+                <input class="form-control me-2" id="buscador" type="text" placeholder="Ingresa alguna marca..." aria-label="Search">
+                
+              </form>
 
+            <button class="btn botonCarrito position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+              <img src="./img/carrito.png" alt="carrito"> 
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorCarrito">
+                
+              </span>
+              
+            </button>
+
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                <div class="offcanvas-header">
+                    <h5 id="offcanvasRightLabel">Tu carrito</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                   <div class="offcanvas-body">
+                     <div class="productos" id="boxCarrito">
+
+
+                    
+
+                     </div>
+                     <div class="pago">
+                      <p class="pago_cantidad">Items: <b id="itemTotal"></b></p>
+                      <p class="pago_total">Total: <b id="precioTotal"></b></p>
+                      <button type="button" class="btn btn-success" id="comprarCarrito">Comprar</button>
+                      <button type="button" class="btn btn-danger" id="borrarCarrito">Vaciar carrito</button>
+                     </div>
+                   </div>
+                   </div>
+          </nav>
+    </header>
+    <main>
+        <div class="titulo" id="ttulo">
+            <h1>Bienvenido a TuZapatilla.com</h1>
+            <p class="subtitulo">Encuentra las mejores zapatillas aqui</p>
+        </div>
+
+
+          <section class="container h-100" id="boxZapatillas">
+            <div class="row" id="contenedorZapatillas">
+              <div id="mensajeNoEncontrado"><h2>LO SENTIMOS.. NO SE A ENCONTRADO ESA MARCA</h2> <img class="llorar" src="./img/pngwing.com.png" alt="llorar"></div>
+                
+
+
+            </div>
+            
+        </section>
+
+        
+    </main>
+    <footer class="footer w-100">
+        <div class="footer_social h-50">
+            <a href="https://www.instagram.com/" target="_blank"><img src="./img/instagram.png" alt="logo instagram"></a>
+            <a href="https://www.facebook.com/" target="_blank"><img src="./img/facebook.png" alt="logo facebook"></a>
+            <a href="https://github.com/" target="_blank"><img src="./img/github.png" alt="logo github"></a>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
     <script src="./app.js"></script>
 </body> 
 </html>
