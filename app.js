@@ -1,121 +1,99 @@
 
-
-//definimos el array de objetos zapatillas
-
-let zapatillas = [
-    {id: 1, marca: "adidas", color: "rosa", cantidad: 10, precio: 120},
-    {id: 2, marca: "nike", color: "azules", cantidad: 15, precio: 90},
-    {id: 3, marca: "vans", color: "rojo", cantidad: 4, precio: 55},
-    {id: 4, marca: "converse", color: "negro", cantidad: 2, precio: 60},
-    {id: 5, marca: "adidas", color: "blanco", cantidad: 5, precio: 85},
-    {id: 6, marca: "puma", color: "verde", cantidad: 8, precio: 130},
-    {id: 7, marca: "vans", color: "blanco", cantidad: 3, precio: 80},
-    {id: 8, marca: "puma", color: "blanco", cantidad: 1, precio: 75},
-    {id: 9, marca: "nike", color: "negro", cantidad: 3, precio: 65},
-    {id: 10, marca: "converse", color: "rojo", cantidad: 4, precio: 100},
-    {id: 11, marca: "nike", color: "rosa", cantidad: 6, precio: 75},
-    {id: 12, marca: "puma", color: "negro", cantidad: 7, precio: 130}
- ];
-
- crearProducto(zapatillas)
-
- function crearProducto(arrayZapatilla){
-     let contenedorZapatillas = document.getElementById("contenedorZapatillas")
-     arrayZapatilla.forEach(zapatilla =>{
-         let cardZapatilla = document.createElement("div")
-         cardZapatilla.classList.add("card", "col-sm-3", "zapatilla", zapatilla.marca, zapatilla.color)
-         cardZapatilla.setAttribute("data-marca", zapatilla.marca)
+ //funcion que crea los productos de la API con sus respectivos datos
+ function crearProducto(datosProductos){
+     let contenedorProductos = document.getElementById("contenedorProductos")
+     datosProductos.forEach(producto =>{
+         let cardProducto = document.createElement("div")
+         let claseProducto = `producto-${producto.id}-${producto.category.replace(/\s+/g, '-')}`; //Reemplaza todos los espacios en blanco con guiones en la categoría del producto 
+         cardProducto.classList.add("card", "col-sm-3", "producto",claseProducto, "hvr-grow")
+         cardProducto.setAttribute("data-marca",producto.title )
 
 
-         cardZapatilla.innerHTML = `
-         <img src="./img/${zapatilla.marca}-${zapatilla.id}.png" class="card-img-top" alt="zapatilla">
-     <div class="card-body">
-         <h5 class="card-title">Zapatillas ${zapatilla.marca} ${zapatilla.color}</h5>
-     </div>
-     <ul class="list-group list-group-flush">
-         <li class="list-group-item">Cantidad: <b>${zapatilla.cantidad}</b></li>
-         <li class="list-group-item">Precio: <b>$${zapatilla.precio}</b></li>
-     </ul>
-     <div class="card-body">
-         <button class="btn btn-primary agregarCarrito" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Agregar al carrito</button>
-     </div>`
+         cardProducto.innerHTML = `
+         <img src="${producto.image}" class="card-img-top" alt="IMGpdto">
+         <div class="card-body">
+             <h5 class="card-title"> ${producto.title} ${producto.category}</h5>
+         </div>
+         <ul class="list-group list-group-flush">
+             <li class="list-group-item" id="precio_producto">Price: <b>$${parseInt(producto.price)}</b></li>
+         </ul>
+         <div class="card-body">
+             <button class="btn btn-primary agregarCarrito" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Add to cart</button>
+         </div>`
 
-         contenedorZapatillas.appendChild(cardZapatilla)
+         contenedorProductos.appendChild(cardProducto)
      })
- }
+
+}
+
+document.getElementById("cargandoMensaje").style.display = "block";
+
+// obtengo todos los datos de la API para usarlo en el proyecto
+ fetch('https://fakestoreapi.com/products?limit=20')
+    .then(res => res.json())
+    .then(datosProductos => {
+        document.getElementById("cargandoMensaje").style.display = "none";
+        crearProducto(datosProductos);
+       
+
+        // AGREAGA CADA PRODUCTO AL CARRITO
+        //para cada producto se seleccionan todos los botones de "agregar al carrito" con la clase correspondiente a la marca en el DOM
+        datosProductos.forEach(producto => {
+            let selector = `.producto-${producto.id}-${producto.category.replace(/\s+/g, '-').replace(/'/g, '\\\'')} .agregarCarrito`;
+            let botonAgregar = document.querySelectorAll(selector);
+        
+            botonAgregar.forEach(boton => {
+                boton.addEventListener("click", () => {
+                    carritoGuardado.push({...producto});
+                    localStorage.setItem("boxCarrito", JSON.stringify(carritoGuardado));
+                    renderizarCarrito();
+                    sumaCarrito();
+                    Toastify({
+                        text: "Added to cart",
+                        duration: 600,
+                        className: "info",
+                        style: {
+                            background: "linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)",
+                          },
+                      }).showToast();
+                    console.log(carritoGuardado);
+                });
+            });
+        });
+    })
+    .catch(error => {
+        console.error('Error al obtener datos de productos:', error);
+        document.getElementById("cargandoMensaje").style.display = "none";
+        
+    });
 
 
 
-//Buscador funcional que muestra productos segun su marca y que al ingresar una marca que no existe mande un mensaje de error
-
-let boxZapatillas = document.getElementById("boxZapatillas")
- 
-//se selecciona el elemento del buscador y cuando se presiona una tecla esta funcion se activa
-
-document.addEventListener("keypress", e =>{
- if (e.target.matches("#buscador")) {  //verifica si el elemento que desencadeno el evento del teclado coincide con el elemento del buscador
-     filtrarZapatillas(e.target.value.toLowerCase()) //si el elemento desencadenado coincide con el buscador se llama a la funcion filtrarZapatillas
-     if(e.key === "Enter"){  //se encarga de evitar el comportamiento predeterminado de la tecla enter
-         e.preventDefault()
-     }
- }
-})
-
- //se compara  la marca de cada zapatilla con el termino de busqueda
- // si la marca existe, solo muestra las zapatillas de cada marca
- // si no existe, muestra un mensaje 
- function filtrarZapatillas(buscador){
-     let marcaEncontrada = false
-     document.querySelectorAll(".zapatilla").forEach(zapatilla =>{
-         let marcaZapatilla = zapatilla.dataset.marca.toLowerCase()
-         if (marcaZapatilla.includes(buscador)) {
-             zapatilla.classList.remove("filtro");
-             marcaEncontrada = true;
-         } else {
-             zapatilla.classList.add("filtro");
-         }
- })
-
-     let marcaNoEncontrada = document.getElementById("mensajeNoEncontrado")
-     if(!marcaEncontrada){
-         marcaNoEncontrada.style.display = "block"
-     }else{
-         marcaNoEncontrada.style.display = "none"
-     }
- } 
-
-
-
-
-
- let boxCarrito = document.querySelector("#boxCarrito")
-
- //se intenta cargar el contenido del carrito desde el localStorage
+//se intenta cargar el contenido del carrito desde el localStorage
  //si no hay nada en el local storage se inicializa como un array vacio
- let carritoGuardado = JSON.parse(localStorage.getItem("boxCarrito")) || [] 
-
+ let boxCarrito = document.querySelector("#boxCarrito")
+ let carritoGuardado = JSON.parse(localStorage.getItem("boxCarrito")) || []  
 
  //funcion que se encarga de mostrar el contenido del carrito al cargar la pagina y al agregar un nuevo elemento al carrito
  function renderizarCarrito(){
      boxCarrito.innerHTML = ""
 
-     carritoGuardado.forEach(zapatilla =>{
+     carritoGuardado.forEach(producto =>{
          let productoCarrito = document.createElement("div")
          productoCarrito.innerHTML = `
-         <div class="card mb-3" data-id="${zapatilla.id}">
+         <div class="card mb-3" id="cardProducto" data-id="${producto.id}">
                  <div class="row g-0">
                    <div class="col-md-4">
-                     <img src="./img/${zapatilla.marca}-${zapatilla.id}.png" class="img-fluid rounded-start" alt="zapatilla">
+                     <img src="${producto.image}" class="img-fluid rounded-start imagenCarrito" alt="Producto">
                    </div>
                    <div class="col-md-6">
-                     <div class="card-body">
-                       <h5 class="card-title">${zapatilla.marca} ${zapatilla.color}</h5>
-                       <p class="card-text">precio: $${zapatilla.precio}</p>
-                       <p class="card-text">cantidad: <b class="ctn-${zapatilla.id}"></b></p>
+                     <div class="card-body" id="precioCarrito">
+                       <h6 class="card-title">${producto.title} ${producto.category}</h6>
+                       <p class="card-text"><b>Price: $${parseInt(producto.price)}</b></p>
                      </div>
                    </div>
                    <div class ="col-md-2 btn-cerrar">
-                   <button type="button" class="btn-close btn-${zapatilla.marca}-${zapatilla.color}" aria-label="Close"></button>
+                   <button type="button" class="btn-close btn-${producto.title}-${producto.category}" aria-label="Close"></button>
                    </div>
                  </div>
                </div>
@@ -124,99 +102,148 @@ document.addEventListener("keypress", e =>{
      })
  }
 
- renderizarCarrito()
+renderizarCarrito() 
 
+
+
+// SUMA CARRITO
 
  //suma precio y cantidad de productos
  let precio = document.getElementById("precioTotal")
-let contadorCarrito = document.getElementById("contadorCarrito")
-let itemCarrito = document.getElementById("itemTotal")
+ let contadorCarrito = document.getElementById("contadorCarrito")
+ let itemCarrito = document.getElementById("itemTotal")
+ let itemPago = document.getElementById("itemPago")
+ let precioPago = document.getElementById("precioPago")
+
 
 function sumaCarrito(){
  let precioTotal = 0
  let productosCarrito = carritoGuardado.length
- carritoGuardado.forEach(zapatillaCarrito => {
-     precioTotal += zapatillaCarrito.precio
+ carritoGuardado.forEach(productoCarrito => {
+     precioTotal += parseInt(productoCarrito.price);
  })
-
+ 
  itemCarrito.textContent = `${productosCarrito}`
  contadorCarrito.textContent = `${productosCarrito}`
+ itemPago.textContent = `${productosCarrito}`
  precio.textContent = `${precioTotal}`
+ precioPago.textContent = `${precioTotal}`
 
 }
 
-sumaCarrito()
-
- //para cada zapatilla se seleccionan todos los botones de "agregar al carrito" con la clase correspondiente a la marca en el DOM
+sumaCarrito() 
 
 
-    
-     zapatillas.forEach(zapatilla => {
-     let productos = document.querySelectorAll(`.zapatilla.${zapatilla.marca}.${zapatilla.color}`)
-     let cantidadp = document.querySelector(`.ctn-${zapatilla.id}`)
-     //cuando se hace click en "agregar al carrito" se agrega esa zapatilla al carritoGuardado y se actualiza en contenido en el localStorage
-     //se llama a la funcion renderizarCarrito para mostrar los cambios en el html mostrando el nuevo producto agregado
+let boxProductos = document.getElementById("boxProductos") 
+ 
+document.addEventListener("keypress", e =>{
+    if (e.target.matches("#buscador")) {  //verifica si el elemento que desencadeno el evento del teclado coincide con el elemento del buscador
+        filtrarProducto(e.target.value.toLowerCase()) //si el elemento desencadenado coincide con el buscador se llama a la funcion filtrarProducto
+        if(e.key === "Enter"){  //se encarga de evitar el comportamiento predeterminado de la tecla enter
+            e.preventDefault()
+        }
+    }
+   })
 
-     productos.forEach(boton => {
-         boton.addEventListener("click", () =>{
-                const zapatillaExistente = carritoGuardado.find(item => item.id === zapatilla.id)
-            
-                if (zapatillaExistente) {
-                    // Muestra una alerta indicando que el producto ya está en el carrito
-                    /* alert(`El producto ${zapatilla.marca} ${zapatilla.color} ya está en el carrito.`); */
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: `El producto ${zapatilla.marca.toUpperCase()} ${zapatilla.color.toUpperCase()} ya está en el carrito.`,
-                      });
-                } else {
-                    // Agrega el producto al carrito si no existe
-                    carritoGuardado.push({ ...zapatilla, cantidad: 1 });
-                    localStorage.setItem("boxCarrito", JSON.stringify(carritoGuardado));
-                    renderizarCarrito();
-                    sumaCarrito();
-                    console.log(carritoGuardado);
-                }
-         })
-     })
- })
+   //se compara  el titulo de cada producto con el termino de busqueda
+ // si el producto existe se muestran los resultados
+ // si no existe, muestra un mensaje 
+
+function filtrarProducto(buscador) {
+    let marcaNoEncontrada = document.getElementById("mensajeNoEncontrado");
+    let marcaEncontrada = false;
+
+    document.querySelectorAll(".producto").forEach(producto => {
+        let tituloProducto = producto.querySelector(".card-title").textContent.toLowerCase();
+        
+        if (tituloProducto.includes(buscador)) {
+            producto.style.display = ""; // Mostrar producto si coincide con la búsqueda
+            marcaEncontrada = true;
+        } else {
+            producto.style.display = "none"; // Ocultar producto si no coincide con la búsqueda
+        }
+    });
+
+    // Mostrar mensaje si no se encuentra ninguna coincidencia
+    marcaNoEncontrada.style.display = marcaEncontrada ? "none" : "block";
+}
 
 
+
+
+// BOTON VACIAR CARRITO
 
  //crear una funcion que elimine los datos del carrito
-
- let LimpiarCarrito = document.getElementById("borrarCarrito")
- LimpiarCarrito.addEventListener("click", borrarCarrito)
+  let LimpiarCarrito = document.getElementById("borrarCarrito")
+  LimpiarCarrito.addEventListener("click", borrarCarrito)
 
  //con innerHTML limpiamos el contenido del carrito en el html
  // carritoGuardado = [] -> reinicia a carritoGuardado
 
- function borrarCarrito(){
-     localStorage.removeItem("boxCarrito")
-     boxCarrito.innerHTML = ""
-     carritoGuardado = []
-     sumaCarrito()
- }
+  function borrarCarrito(){
+    Swal.fire({
+        title: "Do you want to empty the cart?",
+        text: "You will eliminate all your products!",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#15b1b1",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Cancel",
+        confirmButtonText: "Acept"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Removed!",
+            text: "You have emptied your cart.",
+            icon: "success"
+          });
+
+            localStorage.removeItem("boxCarrito")
+            boxCarrito.innerHTML = ""
+            carritoGuardado = []
+            sumaCarrito()
+        }
+      });
+ } 
+
+
+
+// BOTON PARA ELIMINAR UN SOLO PRODUCTO
 
  function eliminar(event) {
-    // Accede al elemento padre del botón, que es el contenedor de la zapatilla
-    const itemAEliminar = event.target.closest(".card");
-    console.log(itemAEliminar)
-    const idEliminar = itemAEliminar.dataset.id;
-    console.log(idEliminar)
+    // Accede al elemento padre del botón, que es el contenedor del producto
+    Toastify({
+        text: "Removed",
+        duration: 500,
+        style: {
+            background: "linear-gradient(to top, #ff0844 0%, #ffb199 100%)"
+        }
+      }).showToast();
 
-    // Elimina el elemento del DOM
-    itemAEliminar.remove();
+        const itemAEliminar = event.target.closest(".card");
+        console.log(itemAEliminar)
+        const idEliminar = itemAEliminar.dataset.id;
+        console.log(idEliminar)
+
+         // busca en el array carritoGuardado el primer elemento cuyo id coincida con el idEliminar
+        //busca y elimina el primer elemento con un id que coincida con el idEliminar del array carritoGuardado. Esto asegura que solo se elimine un elemento con ese id, evitando eliminar elementos adicionales que puedan tener el mismo id.
+        const index = carritoGuardado.find(producto => producto.id == idEliminar);
+        if (index !== -1) {
+            carritoGuardado.splice(index, 1); // Elimina solo el primer elemento con el ID dado
+        }
+   
+        // Elimina el elemento del DOM
+        itemAEliminar.remove();
     
 
-    carritoGuardado = carritoGuardado.filter(producto => producto.id != idEliminar);
-    localStorage.setItem("boxCarrito", JSON.stringify(carritoGuardado));
+        localStorage.setItem("boxCarrito", JSON.stringify(carritoGuardado));
 
         // actualizo los nuevos valores del carrito
-    sumaCarrito();
-}
+        sumaCarrito();
+        }
 
 
+        
         document.addEventListener("click", function(event) {
             if (event.target.classList.contains("btn-close")) {
                 eliminar(event);
@@ -225,10 +252,34 @@ sumaCarrito()
 
        
 
-        
-        
+        let botonCompra = document.getElementById("botonCompra")
+        botonCompra.addEventListener("click", realizarCompra)
 
-      
+        function realizarCompra() {
+            // Vaciar el carrito
+            Swal.fire({
+                title: "confirm the purchase?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#15b1b1",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "yes, buy",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Vaciar el carrito
+                    localStorage.removeItem("boxCarrito");
+                    carritoGuardado = [];
+                    renderizarCarrito();
+                    sumaCarrito();
+                    Swal.fire(
+                        "¡Success!",
+                        "Thanks for your purchase.",
+                        "success"
+                    );
+                }
+            });
+        }
 
        
        

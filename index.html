@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es/en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <title>Proyecto JavaScript</title>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navegacion">
             <div>
-              <a class="navbar-brand logo" href="./index.html">TuZapatilla.com</a>
+              <a class="navbar-brand logo" href="./index.html">ModaMix.com</a>
             </div>
             
             <form class="d-flex buscador">
-                <input class="form-control me-2" id="buscador" type="text" placeholder="Ingresa alguna marca..." aria-label="Search">
+                <input class="form-control me-2" id="buscador" type="text" placeholder="Search..." aria-label="Search">
                 
               </form>
 
@@ -29,7 +30,7 @@
 
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
                 <div class="offcanvas-header">
-                    <h5 id="offcanvasRightLabel">Tu carrito</h5>
+                    <h5 id="offcanvasRightLabel">Your Cart</h5>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                    <div class="offcanvas-body">
@@ -41,9 +42,10 @@
                      </div>
                      <div class="pago">
                       <p class="pago_cantidad">Items: <b id="itemTotal"></b></p>
-                      <p class="pago_total">Total: <b id="precioTotal"></b></p>
-                      <button type="button" class="btn btn-success" id="comprarCarrito">Comprar</button>
-                      <button type="button" class="btn btn-danger" id="borrarCarrito">Vaciar carrito</button>
+                      <p class="pago_total">Total: $<b id="precioTotal"></b></p>
+                      
+                      <button class="btn btn-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" id="pagarCarrito" aria-controls="offcanvasBottom">Pay</button>
+                      <button type="button" class="btn btn-danger" id="borrarCarrito">Empty Cart</button>
                      </div>
                    </div>
                    </div>
@@ -51,21 +53,40 @@
     </header>
     <main>
         <div class="titulo" id="ttulo">
-            <h1>Bienvenido a TuZapatilla.com</h1>
-            <p class="subtitulo">Encuentra las mejores zapatillas aqui</p>
+        <h1>Welcome to ModaMix.com</h1>
+            <p class="subtitulo">Find everything you need, from clothing to tech items.</p>
         </div>
 
-
-          <section class="container h-100" id="boxZapatillas">
-            <div class="row" id="contenedorZapatillas">
-              <div id="mensajeNoEncontrado"><h2>LO SENTIMOS.. NO SE A ENCONTRADO ESA MARCA</h2> <img class="llorar" src="./img/pngwing.com.png" alt="llorar"></div>
+          <section class="container h-100" id="boxProductos">
+            <div class="row" id="contenedorProductos">
+              <div id="mensajeNoEncontrado"><h2>We're sorry... That brand hasn't been found.</h2> <img class="llorar" src="./img/pngwing.com.png" alt="llorar"></div>
                 
-
+              <div id="cargandoMensaje">
+                <div>
+                  <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <h3>Loading products...</h3>
+                </div>
+            </div>
 
             </div>
             
         </section>
 
+        <div class="offcanvas offcanvas-bottom container" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasBottomLabel"></h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body small row" id="realizarPago">
+            <div class=" infoPago">
+              <h6 class="pago_cantidad">Items: <b id="itemPago"></b></h6>
+            <h6 class="pago_total">Total: $<b id="precioPago"></b></h6>
+            <button type="button" id="botonCompra" class="btn btn-success">Confirm payment</button>
+            </div>
+          </div>
+          </div>
         
     </main>
     <footer class="footer w-100">
@@ -75,8 +96,13 @@
             <a href="https://github.com/" target="_blank"><img src="./img/github.png" alt="logo github"></a>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="./js/bootstrap.bundle.min.js"></script>
     <script src="./app.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
 </body> 
 </html>
